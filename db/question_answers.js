@@ -14,7 +14,7 @@ const db = Promise.promisifyAll(connection, { multiArgs: true });
 db.connectAsync()
   .then(() => console.log(`Connected to MySQL as id: ${db.threadId}`))
   .then(() => db.queryAsync(
-    `DROP TABLE IF EXISTS Questions;
+    `
     CREATE TABLE IF NOT EXISTS Questions (
         id INTEGER NOT NULL AUTO_INCREMENT,
         product_id INTEGER NULL,
@@ -92,49 +92,5 @@ db.connectAsync()
   .catch((err) => console.log(err));
 
 
+module.exports = db;
 
-
-
-// connection.connect((err) => {
-//   if (err) {
-//     console.log('Error!');
-//   }
-//   console.log('Connected!');
-// });
-
-// const fs = require('fs');
-// const readline = require('readline');
-
-// const photos = fs.createReadStream('../csv_data/answers_photos.csv');
-// const photosReader = readline.createInterface({ input: photos });
-
-// const questions = fs.createReadStream('../csv_data/questions.csv');
-// const questionsReader = readline.createInterface({ input: questions });
-
-// const answers = fs.createReadStream('../csv_data/answers.csv');
-// const answersReader = readline.createInterface({ input: answers });
-// // const { insertIntoTable } = require('../db/ratings_reviews.js');
-
-// photosReader.on('line', line => {
-//   /*
-
-//   */
-// });
-
-// setTimeout(() => photosReader.close(), 2);
-
-// questionsReader.on('line', line => {
-//   /*
-
-//   */
-// });
-
-// setTimeout(() => questionsReader.close(), 2);
-
-// answersReader.on('line', line => {
-//   /*
-
-//   */
-// });
-
-// setTimeout(() => answersReader.close(), 2);
