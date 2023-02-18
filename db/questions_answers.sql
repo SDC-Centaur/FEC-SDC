@@ -1,0 +1,61 @@
+CREATE DATABASE IF NOT EXISTS SDC;
+USE SDC;
+
+DROP TABLE IF EXISTS `Products`;
+
+CREATE TABLE `Products` (
+  `id` INTEGER NULL AUTO_INCREMENT DEFAULT NULL,
+  PRIMARY KEY (`id`)
+);
+
+-- ---
+-- Table 'Questions'
+--
+-- ---
+
+DROP TABLE IF EXISTS `Questions`;
+
+CREATE TABLE `Questions` (
+  `id` INTEGER NULL AUTO_INCREMENT DEFAULT NULL,
+  `product_id` INTEGER NULL DEFAULT NULL,
+  `question_body` VARCHAR NULL DEFAULT NULL,
+  `question_date` VARCHAR NULL DEFAULT NULL,
+  `asker_name` VARCHAR NULL DEFAULT NULL,
+  `asker_email` VARCHAR NULL DEFAULT NULL,
+  `question_helpfulness` INTEGER NULL DEFAULT NULL,
+  `reported` VARCHAR NULL DEFAULT NULL,
+  PRIMARY KEY (`id`)
+);
+
+-- ---
+-- Table 'Answers'
+--
+-- ---
+
+DROP TABLE IF EXISTS `Answers`;
+
+CREATE TABLE `Answers` (
+  `id` INTEGER NULL AUTO_INCREMENT DEFAULT NULL,
+  `question_id` INTEGER NULL DEFAULT NULL,
+  `body` VARCHAR NULL DEFAULT NULL,
+  `date` VARCHAR NULL DEFAULT NULL,
+  `answerer_name` VARCHAR NULL DEFAULT NULL,
+  `answerer_email` VARCHAR NULL DEFAULT NULL,
+  `reported` VARCHAR NULL DEFAULT NULL,
+  `helpfulness` INTEGER NULL DEFAULT NULL,
+  PRIMARY KEY (`id`)
+);
+
+-- ---
+-- Table 'Photos'
+--
+-- ---
+
+DROP TABLE IF EXISTS `Photos`;
+
+CREATE TABLE `Photos` (
+  `id` INTEGER NULL AUTO_INCREMENT DEFAULT NULL,
+  `answer_id` INTEGER NULL DEFAULT NULL,
+  `url` VARCHAR NULL DEFAULT NULL,
+  PRIMARY KEY (`id`)
+);
