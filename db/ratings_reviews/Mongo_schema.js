@@ -8,7 +8,7 @@ const reviewSchema = new mongoose.Schema({
   _id: Number,
   product_id: Number,
   rating: Number,
-  date: Number,
+  date: Date,
   summary: String,
   body: String,
   recommend: Boolean,

@@ -32,6 +32,10 @@ const fileNames = [
 
 // Main function for ETL process, insert by batch
 async function ETL(batchSize = 5000) {
+  // drop the reviews collection
+  await Review.deleteMany({});
+  console.log('All documents in collection Reviews have been deleted...');
+
   // Create four asyncReaders
   const [reviews, photos, chars, charReviews] = fileNames.map(fileName => {
     return createReader('../../csv_data/' + fileName);
