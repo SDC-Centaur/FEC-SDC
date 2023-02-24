@@ -31,7 +31,7 @@ async function ESL() {
 
   // Load all CSV into SQL tables
   await Promise.all(tableNames.map(tableName => {
-    const tablePath = path.join(__dirname, '../../csv_data', tableName + '.csv');
+    const tablePath = path.join(__dirname, '../../../csv_data', tableName + '.csv');
     return connection.query({
       sql: loadData,
       values: [tablePath, tableName],

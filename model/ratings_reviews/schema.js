@@ -3,23 +3,35 @@ const { Schema } = require('mongoose');
 
 // Create reviews Schema, the data type and validation are based on CSV and client requirement
 // Do not set up index here, leave it for later optimzation
-const reviewSchema = new mongoose.Schema({
-  _id: { type: Number, required: true },
+const reviewSchema = new Schema({
   product_id: { type: Number, required: true },
   rating: { type: Number, required: true, min: 1, max: 5 },
   date: { type: Date, default: Date.now },
   summary: { type: String, required: true, maxLength: 60 },
-  body: { type: String, required: true, maxLength: 1000 },
+  body: { type: String, required: true, minLength: 50, maxLength: 1000 },
   recommend: { type: Boolean, default: false },
   reported: { type: Boolean, default: false },
   reviewer_name: { type: String, required: true, maxLength: 60 },
   reviewer_email: { type: String, required: true, maxLength: 60 },
   response: { type: String, default: null },
   helpfulness: { type: Number, default: 0, min: 0},
-  photos: [ { type: String, maxLength: 100 } ],
-  char_keys: [ { type: String, maxLength: 10 } ],
-  char_values: [ { type: Number, min: 1, max: 5 } ],
+  photos: [ String ],
+  characteristics: { type: Map, of: Number }
 });
 
-// Export the Review Schema
-module.exports = { reviewSchema };
+// Create reviews meta Schema.
+// The model can only be updated, not deleted nor created
+const reviewMetaSchema = new Schema({
+  _id: { type: Number, required: true },
+  reviewCount: { type: Number, default: 0 },
+  ratings: { type: Map, of: { type: Number, min: 0 } },
+  recommend: {
+    'true': Number,
+    'false': Number
+  },
+  characteristics: { type: Map, of: { type: Number, min: 0 } }
+});
+
+
+// Export the schemas
+module.exports = { reviewSchema, reviewMetaSchema };
