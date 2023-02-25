@@ -3,80 +3,152 @@ const express = require('express');
 const path = require('path');
 
 const app = express();
+const cors = require('cors');
 
 
 app.use(express.json());
-app.use(express.static(path.join(__dirname, '../public')));
 
+// app.get('/questions', (req, res) => {
+//   let start = Date.now();
+//   const id = req.query.product_id
+//   let questions = qa_queries.questionById(id);
+//   questions.then((question) => {
+//     res.send(question[0])
+//     console.log((Date.now() - start) / 1000, 'sec')
+//   })
+// });
+app.get('/questions', async (req, res) => {
+  try {
+    let start = Date.now();
+    const id = req.query.product_id
 
-app.get('/questions', (req, res) => {
-  const id = req.query.product_id
-  qa_queries.questionById(id);
+    const [questions] = await qa_queries.questionById(id);
+    const resultQuest = [];
+
+    for (const questionsArr of questions) {
+      const [answersArray] = await qa_queries.answerById(questionsArr.id);
+      questionsArr.answers = answersArray;
+      for (const answerObj of answersArray) {
+        const [photosArr] = await qa_queries.photosById(answerObj.id);
+        answerObj.photos = photosArr;
+        console.log(answerObj)
+      }
+      resultQuest.push(questionsArr);
+    }
+    console.log((Date.now() - start) / 1000, 'sec')
+    res.status(200).json(resultQuest);
+  } catch (error) {
+    console.log(error);
+    res.sendStatus(401);
+  }
 });
 
 app.post('/questions', (req, res) => {
+  let start = Date.now();
   const {product_id, body, name, email} = req.body;
+  console.log({product_id})
   qa_queries.postQuestion({product_id, body, name, email});
+  res.send('received')
+  console.log((Date.now() - start) / 1000, 'sec')
 });
 
-app.get('/answers', (req, res) => {
-  const q_id = req.query.question_id
-  //const p_id = req.query.answers
-  qa_queries.answerById(q_id)
-  //qa_queries.photosById(i)
+app.get('/answers', async (req, res) => {
+  try {
+    let start = Date.now();
+    const q_id = req.query.question_id;
+
+    const [answers] = await qa_queries.answerById(q_id);
+    const resultArr = [];
+
+    for (const answerObj of answers) {
+      const [photosArr] = await qa_queries.photosById(answerObj.id);
+
+      answerObj.photos = photosArr;
+      resultArr.push(answerObj);
+      console.log('result: ', resultArr)
+    }
+    console.log((Date.now() - start) / 1000, 'sec')
+    res.status(200).json(resultArr);
+  } catch (error) {
+    console.log(error);
+    res.sendStatus(401);
+  }
 });
 
 app.post('/answers', (req, res) => {
+  let start = Date.now();
   const {question_id, body, name, email} = req.body;
-  qa_queries.postAnswer({question_id, body, name, email, photo})
-  // qa_queries.postPhotos({})
-
-  // console.log(req.body);
-  // axios({
-  //   method: 'post',
-  //   url: `https://app-hrsei-api.herokuapp.com/api/fec2/hr-rfe/qa/questions/${req.body.question_id}/answers`,
-  //   headers: { Authorization: process.env.AUTH_SECRET },
-  //   data: {
-  //     body: req.body.body,
-  //     name: req.body.name,
-  //     email: req.body.email,
-  //     photo: req.body.photo,
-  //   },
-  // })
-  //   .then(() => {
-  //     res.sendStatus(201);
-  //   })
-  //   .catch((err) => {
-  //     console.log(err);
-  //   });
+  qa_queries.postAnswer({question_id, body, name, email})
+  res.send('received')
+  console.log((Date.now() - start) / 1000, 'sec')
 });
 
-app.post('/helpful', (req, res) => {
-  // axios.put(`https://app-hrsei-api.herokuapp.com/api/fec2/hr-rfe/qa/${req.query.type}/${req.query.id}/helpful`, null, {
-  //   headers: {
-  //     Authorization: process.env.AUTH_SECRET,
-  //   },
-  // })
-  //   .then(() => {
-  //     console.log('done');
-  //     res.status(200);
-  //   })
-  //   .catch(() => res.send('Error occurred when updating helpfulness'));
+app.put('/helpful', (req, res) => {
+  let id;
+  if (req.query.question_id !== undefined) {
+    id = req.query.question_id
+    qa_queries.updateHelp(id)
+  } else {
+    id = req.query.answer_id
+    qa_queries.updateHelpAns(id)
+  }
+  res.send('updated')
 });
 
-app.post('/report', (req, res) => {
-  // console.log(req.body);
-  // axios.put(`https://app-hrsei-api.herokuapp.com/api/fec2/hr-rfe/qa/answers/${req.body.answerId}/report`, null, {
-  //   headers: {
-  //     Authorization: process.env.AUTH_SECRET,
-  //   },
-  // })
-  //   .then(() => {
-  //     console.log('REPORTED');
-  //     res.status(204);
-  //   })
-  //   .catch(() => res.send('Error occurred when reporting'));
+app.put('/report', (req, res) => {
+  let id;
+  if (req.query.question_id !== undefined) {
+    id = req.query.question_id
+    qa_queries.updateReport(id)
+  } else {
+    id = req.query.answer_id
+    qa_queries.updateReportAns(id)
+  }
+  res.send('reported')
 });
 
-app.listen(3000);
-console.log('Listening at http://localhost:3000');
+
+app.listen(3000, () => {console.log('Listening at http://localhost:3000');});
+
+
+// GET answers old version
+  // let start = Date.now();
+  // const q_id = req.query.question_id
+  // let answers = qa_queries.answerById(q_id);
+  // answers.then((answer) => {
+  //   let answersArray = answer[0];
+  //   answersArray.map((answerObj) => {
+  //     answerObj.photos = [];
+  //     let photosArr = qa_queries.photosById(answerObj.id)
+  //      photosArr.then((photo) => {
+  //       if (photo[0].length > 0) {
+  //         answerObj.photos = photo[0];
+  //         //res.send(answerObj)
+  //       }
+  //     })
+  //   })
+  //   res.send(answer[0])
+  //   console.log((Date.now() - start) / 1000, 'sec')
+  // })
+
+  // app.get('/answers', (req, res) => {
+//   let start = Date.now();
+//   const q_id = req.query.question_id
+//   let answers = qa_queries.answerById(q_id);
+//   answers.then((answer) => {
+//     console.log(answer[0])
+//     answer[0].map((answerObj) => {
+//     answerObj.photos = [];
+//     let photosArr = qa_queries.photosById(answerObj.id)
+//     photosArr.then((photo) => {
+//       if (photo[0].length > 0) {
+//         answerObj.photos = photo[0];
+//       }
+//       res.send(answer[0])
+//       console.log((Date.now() - start) / 1000, 'sec')
+//     })
+//     .catch(err => console.log(err))
+//     })
+//   })
+//   .catch(err => console.log(err))
+// });

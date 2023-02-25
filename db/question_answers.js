@@ -1,6 +1,7 @@
 const mysql = require('mysql2');
 const Promise = require('bluebird');
 const fs = require('fs')
+const path = require('../csv_data/questions.csv')
 
 const connection = mysql.createConnection({
   host: 'localhost',
@@ -41,7 +42,6 @@ db.connectAsync()
     console.log('QUESTIONS DONE!')
   })
   .then(() => db.queryAsync(`
-      DROP TABLE IF EXISTS Answers;
       CREATE TABLE IF NOT EXISTS Answers (
         id INTEGER NOT NULL AUTO_INCREMENT,
         question_id INTEGER NULL,
@@ -68,7 +68,6 @@ db.connectAsync()
     console.log('ANSWERS DONE!')
   })
   .then(() => db.queryAsync(`
-    DROP TABLE IF EXISTS Photos;
       CREATE TABLE IF NOT EXISTS Photos (
         id INTEGER NOT NULL AUTO_INCREMENT,
         answer_id INTEGER NULL,
@@ -91,6 +90,4 @@ db.connectAsync()
   })
   .catch((err) => console.log(err));
 
-
-module.exports = db;
 
